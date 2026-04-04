@@ -62,9 +62,9 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
 <div class="card">
-  <div class="header">Alerte détectée</div>
+  <div class="header">Message reçu</div>
   <h1>{{ title }}</h1>
-  <div class="content">{{ html_content | safe }}</div>
+  <div class="content">{{ html_content }}</div>
   {% if buttons %}
   <div class="buttons">
     {% for btn in buttons %}
@@ -74,6 +74,20 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   {% endif %}
   <div class="footer">{{ sent_at }}</div>
 </div>
+<script>
+  // Plein écran automatique au chargement
+  function goFullscreen() {
+    const el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  }
+  // Les navigateurs exigent un geste utilisateur pour requestFullscreen,
+  // donc on tente au clic ET au chargement
+  document.addEventListener('click', goFullscreen, { once: true });
+  window.addEventListener('load', () => {
+    setTimeout(goFullscreen, 500);
+  });
+</script>
 </body>
 </html>"""
 
