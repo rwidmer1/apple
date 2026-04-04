@@ -64,7 +64,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <div class="card">
   <div class="header">Alerte détectée</div>
   <h1>{{ title }}</h1>
-  <div class="content">{{ html_content }}</div>
+  <div class="content">{{ html_content | safe }}</div>
   {% if buttons %}
   <div class="buttons">
     {% for btn in buttons %}
