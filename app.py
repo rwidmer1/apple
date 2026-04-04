@@ -36,34 +36,28 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
     max-width: 680px;
     width: 100%;
   }
-  .header {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #999;
-    margin-bottom: 0.5rem;
-  }
-  h1 {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #1d1d1f;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e5e5e5;
-  }
+  .header { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #999; margin-bottom: 0.5rem; }
+  h1 { font-size: 1.6rem; font-weight: 700; color: #1d1d1f; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e5e5; }
   .content { line-height: 1.7; color: #333; font-size: 1rem; }
   .content img { max-width: 100%; border-radius: 10px; margin: 1rem 0; }
   .content a { color: #0071e3; }
   .content h2 { margin: 1rem 0 0.5rem; }
   .content p { margin-bottom: 0.75rem; }
-  .footer {
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e5e5e5;
-    font-size: 0.75rem;
-    color: #aaa;
-    text-align: right;
+  .buttons { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.75rem; }
+  .btn {
+    display: inline-block;
+    background: #0071e3;
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.1s;
   }
+  .btn:hover { background: #0077ed; transform: scale(1.02); }
+  .btn:active { transform: scale(0.98); }
+  .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e5e5; font-size: 0.75rem; color: #aaa; text-align: right; }
 </style>
 </head>
 <body>
@@ -71,6 +65,13 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   <div class="header">Message reçu</div>
   <h1>{{ title }}</h1>
   <div class="content">{{ html_content }}</div>
+  {% if buttons %}
+  <div class="buttons">
+    {% for btn in buttons %}
+    <a href="{{ btn.url }}" target="_blank" class="btn">{{ btn.label }}</a>
+    {% endfor %}
+  </div>
+  {% endif %}
   <div class="footer">{{ sent_at }}</div>
 </div>
 </body>
@@ -83,6 +84,7 @@ def send_message():
     title = data.get("title", "Message")
     html_content = data.get("html_content", "")
     message = data.get("message", "")
+    buttons = data.get("buttons", [])
 
     if not html_content and not message:
         return jsonify({"error": "Contenu vide"}), 400
@@ -90,10 +92,10 @@ def send_message():
     msg_id = str(uuid.uuid4())[:8]
     sent_at = time.strftime("%d/%m/%Y à %H:%M")
 
-    # Stocker la page HTML
     message_pages[msg_id] = {
         "title": title,
         "html_content": html_content or f"<p>{message}</p>",
+        "buttons": [b for b in buttons if b.get("label") and b.get("url")],
         "sent_at": sent_at
     }
 
